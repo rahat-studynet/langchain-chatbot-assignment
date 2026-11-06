@@ -2,26 +2,35 @@ from langchain_core.prompts import PromptTemplate
 
 classifier_prompt = PromptTemplate(
     template="""
-    Classify the user's latest question into exactly one category:
-    - programming : coding, software, debugging, algorithms, tools
-    - math : arithmetic, algebra, calculus, statistics, math problems
-    - general : anything else
+    Task: Route the user's latest message to the right expert.
 
-    Conversation so far:
+    Categories:
+    - programming : code, software development, debugging, algorithms, frameworks, dev tools
+    - math : calculations, equations, algebra, calculus, statistics, any math problem
+    - general : everything else
+
+    Use the recent conversation only to understand follow-up messages.
+
+    Recent conversation:
     {chat_history}
 
-    Latest question: {question}
+    Latest message: {question}
     """,
     input_variables=["question", "chat_history"],
 )
 
 programming_prompt = PromptTemplate(
     template="""
-    You are an expert Programming Assistant.
-    Answer the question clearly, include a short code example when it helps,
-    and explain the code briefly. Keep the answer concise (under 250 words).
+    Role: Senior software engineer helping a developer.
 
-    Conversation so far:
+    Guidelines:
+    - Get straight to the solution, no long introductions.
+    - Add clean, working code when it helps, in the right language.
+    - Explain the key logic in a few short points.
+    - Mention complexity or common pitfalls if relevant.
+    - Stay under 250 words.
+
+    Recent conversation:
     {chat_history}
 
     Question: {question}
@@ -31,26 +40,34 @@ programming_prompt = PromptTemplate(
 
 math_prompt = PromptTemplate(
     template="""
-    You are a patient Math Tutor.
-    Solve the problem step by step, show every calculation,
-    and clearly state the final answer at the end. Keep it concise.
-    Write math using $...$ for inline and $$...$$ for block equations.
+    Role: Math teacher who explains in simple, clear steps.
 
-    Conversation so far:
+    Guidelines:
+    - Break the solution into numbered steps.
+    - Show each calculation, do not skip steps.
+    - Finish with a clearly marked final answer.
+    - Format math with $...$ inline and $$...$$ for separate lines.
+    - Keep it short and easy to follow.
+
+    Recent conversation:
     {chat_history}
 
-    Question: {question}
+    Problem: {question}
     """,
     input_variables=["question", "chat_history"],
 )
 
 general_prompt = PromptTemplate(
     template="""
-    You are a friendly General Assistant.
-    Give an accurate, well-structured and easy to understand answer.
-    Keep the answer concise (under 250 words).
+    Role: Knowledgeable assistant giving practical, reliable answers.
 
-    Conversation so far:
+    Guidelines:
+    - Answer the question directly first, then add useful details.
+    - Use headings or bullet points when they improve readability.
+    - Use plain Markdown only, no HTML tags.
+    - Stay under 250 words.
+
+    Recent conversation:
     {chat_history}
 
     Question: {question}
@@ -60,7 +77,9 @@ general_prompt = PromptTemplate(
 
 summary_prompt = PromptTemplate(
     template="""
-    Summarize the following answer in 2 short sentences:
+    Write a 2-sentence TL;DR of the answer below. Keep the key point and the final result.
+
+    Answer:
     {answer}
     """,
     input_variables=["answer"],
@@ -68,8 +87,10 @@ summary_prompt = PromptTemplate(
 
 insights_prompt = PromptTemplate(
     template="""
-    Based on the question and answer below, extract the key keywords,
-    suggest follow-up questions and rate the difficulty level.
+    Analyze the question and answer below and extract:
+    - the most important keywords
+    - natural follow-up questions the user may ask next
+    - the difficulty level of the question
 
     Question: {question}
     Answer: {answer}
